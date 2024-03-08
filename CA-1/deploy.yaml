@@ -1,0 +1,8 @@
+- name: Check if docker is installed or not
+  command: docker --version
+  register: docker_valid
+  ignore_errors: yes
+
+- name: Install Docker pre-requisites
+  command: sudo ansible playbook run docker-install.yaml
+  when: docker_valid.failed

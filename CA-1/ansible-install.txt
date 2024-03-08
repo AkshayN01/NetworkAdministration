@@ -1,0 +1,5 @@
+1. python3 -m pip install --user ansible
+2. python3 -m pip install --user ansible-core
+
+upgrade Ansible:
+1. python3 -m pip install --upgrade --user ansible
