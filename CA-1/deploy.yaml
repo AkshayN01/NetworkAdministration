@@ -1,8 +1,32 @@
-- name: Check if docker is installed or not
-  command: docker --version
-  register: docker_valid
-  ignore_errors: yes
+- name: Deploy Apache container
+  hosts: localhost
+  become: yes
 
-- name: Install Docker pre-requisites
-  command: sudo ansible playbook run docker-install.yaml
-  when: docker_valid.failed
+  tasks:
+    - name: Check if docker is installed or not
+      command: docker --version
+      register: docker_valid
+      ignore_errors: yes
+
+    - name: Print variable values
+      debug:
+        var: docker_valid
+
+    - name: Install Docker pre-requisites
+      include_tasks: docker-install.yaml
+      when: docker_valid.failed
+
+    - name: Create docker network
+      shell: "sudo docker network create --driver=bridge --subnet=172.168.10.0/30 shared || true"
+      become: true
+
+    - name: Build Apache container
+      shell: "docker build -t apache-server ./Apache"
+      become: true
+
+    - name: Run Apache container
+      shell: "docker run -d -p 8080:80 --name my-apache-server apache-server"
+      become: true
+
+    - name: Connect Apache to the created network
+      shell: "docker network connect shared my-apache-server"
