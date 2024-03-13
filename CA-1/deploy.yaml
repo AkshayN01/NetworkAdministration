@@ -20,13 +20,17 @@
       shell: "sudo docker network create --driver=bridge --subnet=172.168.10.0/30 shared || true"
       become: true
 
-    - name: Build Apache container
-      shell: "docker build -t apache-server ./Apache"
-      become: true
+    # - name: Build Apache container
+    #   shell: "sudo docker build -t apache-server ./Apache"
+    #   become: true
 
+    # - name: Run Apache container
+    #   shell: "sudo docker run -d -p 80:80 --name my-apache-server apache-server tail -f /dev/null"
+    #   become: true
+      
     - name: Run Apache container
-      shell: "docker run -d -p 8080:80 --name my-apache-server apache-server"
+      shell: 'sudo docker run -d --name my-apache-server -p 80:80 -v ./website/:/usr/local/apache2/htdocs/ httpd:2.4'
       become: true
 
     - name: Connect Apache to the created network
-      shell: "docker network connect shared my-apache-server"
+      shell: "sudo docker network connect shared my-apache-server"
