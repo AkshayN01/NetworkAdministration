@@ -23,4 +23,4 @@ This repository contains all the ansible scripts required to run Apache server a
         - '-d' runs the container in a detached mode as a background process.
         - '-p 80:80' maps the port 80 of the host to port 80 of the container. This will make all the public requests made on port 80 to be redirected to the port 80 of the container.
             - This is done by mapping './website/' to '/usr/local/apache2/htdocs/'. The './website' folder acts a root folder here.
-            
+            - Instead of serving the content from the container, a simple web page will be served from './website' folder.
