@@ -10,16 +10,19 @@
 
     - name: Print variable values
       debug:
-        var: docker_valid
+        var: docker_valid #contains a json object
 
     - name: Install Docker pre-requisites
       include_tasks: docker-install.yaml
-      when: docker_valid.failed
+      when: docker_valid.failed #returns a boolean value
 
+    # Below task creates a custom network with the mentioned subnet. The custom network is named as 'shared'
     - name: Create docker network
-      shell: "sudo docker network create --driver=bridge --subnet=172.168.10.0/30 shared || true"
+      shell: "sudo docker network create --driver=bridge --subnet=172.168.10.0/30 shared || true" #adding '|| true' will not return error while running the script
       become: true
 
+    # Below commands uses a Dockerfile to run apache container
+    # --------------------------------------------------------
     # - name: Build Apache container
     #   shell: "sudo docker build -t apache-server ./Apache"
     #   become: true
@@ -27,7 +30,7 @@
     # - name: Run Apache container
     #   shell: "sudo docker run -d -p 80:80 --name my-apache-server apache-server tail -f /dev/null"
     #   become: true
-      
+    # ---------------------------------------------------------
     - name: Run Apache container
       shell: 'sudo docker run -d --name my-apache-server -p 80:80 -v ./website/:/usr/local/apache2/htdocs/ httpd:2.4'
       become: true
