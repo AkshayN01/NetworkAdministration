@@ -6,6 +6,7 @@
     network_name: shared
     subnet: 172.168.10.0/30
     host_port: 80
+    webroot: "./website/"
 
   tasks:
     - name: Check if docker is installed or not
@@ -26,23 +27,28 @@
       shell: "sudo docker network create --driver=bridge --subnet={{subnet}} {{network_name}} || true" #adding '|| true' will not return error while running the script
       become: true
 
-    # Below commands uses a Dockerfile to run apache container
-    # --------------------------------------------------------
-    # - name: Build Apache container
-    #   shell: "sudo docker build -t apache-server ./Apache"
-    #   become: true
+    - name: pull image
+      community.docker.docker_image:
+        name: httpd
+        source: pull
+        tag: latest
 
-    # - name: Run Apache container
-    #   shell: "sudo docker run -d -p 80:80 --name {{container_name}} apache-server tail -f /dev/null"
-    #   become: true
-    # ---------------------------------------------------------
+    - name: webroot present
+      ansible.builtin.file:
+        path: "{{webroot}}"
+        state: directory
 
-    - name: Run Apache container
-      shell: 'sudo docker run -d --name {{container_name}} -p {{host_port}}:80 -v ./website/:/usr/local/apache2/htdocs/ httpd:2.4'
-      become: true
-
-    - name: Connect Apache to the created network
-      shell: "sudo docker network connect {{network_name}} {{container_name}}"
-
-    - name: Restart the container every time the system reboots
-      shell: "sudo docker update --restart=always {{container_name}}"
+    - name: run httpd container
+      community.docker.docker_container:
+        name: webserver
+        image: httpd
+        state: started
+        detach: true
+        restart: yes
+        exposed_ports:
+          - 80
+        ports:
+          - 80:80
+        volumes: "{{ webroot }}:/usr/local/apache2/htdocs/"
+        networks:
+          - name: "{{network_name}}"
