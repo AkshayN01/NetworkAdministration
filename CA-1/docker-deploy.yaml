@@ -24,7 +24,7 @@
 
     # Below task creates a custom network with the mentioned subnet. The custom network is named as 'shared'
     - name: Create docker network
-      shell: "sudo docker network create --driver=bridge --subnet={{subnet}} {{network_name}} || true" #adding '|| true' will not return error while running the script
+      shell: "sudo docker network create --driver=bridge --subnet={{subnet}} {{network_name}} || true" #adding '|| true' will not return error while running the script again
       become: true
 
     - name: pull image
@@ -50,6 +50,6 @@
           - 80
         ports:
           - 80:80
-        volumes: "{{ webroot }}:/usr/local/apache2/htdocs/"
+        volumes: "{{webroot}}:/usr/local/apache2/htdocs/"
         networks:
           - name: "{{network_name}}"
