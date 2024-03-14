@@ -40,11 +40,12 @@
 
     - name: run httpd container
       community.docker.docker_container:
-        name: webserver
+        name: "{{container_name}}"
         image: httpd
         state: started
         detach: true
         restart: yes
+        restart_policy: always
         exposed_ports:
           - 80
         ports:
