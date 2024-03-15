@@ -1,5 +1,6 @@
+---
 - name: Deploy Apache container
-  hosts: localhost
+  hosts: apache
   become: yes
   vars:
     container_name: my-apache-server
