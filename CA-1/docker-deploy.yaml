@@ -2,6 +2,8 @@
 - name: Deploy Apache container
   hosts: apache
   become: yes
+  collections:
+    - community.docker
   vars:
     container_name: my-apache-server
     network_name: shared
@@ -23,5 +25,34 @@
       include_tasks: docker-install.yaml
       when: docker_valid.failed #returns a boolean value
 
-    - name: Install Apache docker container
-      include_tasks: apache-install.yaml
+    # Below task creates a custom network with the mentioned subnet. The custom network is named as 'shared'
+    - name: Create docker network
+      shell: "sudo docker network create --driver=bridge --subnet={{subnet}} {{network_name}} || true" #adding '|| true' will not return error while running the script again
+      become: true
+
+    - name: pull image
+      community.docker.docker_image:
+        name: httpd
+        source: pull
+        tag: latest
+
+    - name: webroot present
+      ansible.builtin.file:
+        path: "{{webroot}}"
+        state: directory
+
+    - name: run httpd container
+      community.docker.docker_container:
+        name: "{{container_name}}"
+        image: httpd
+        state: started
+        detach: true
+        restart: yes
+        restart_policy: always
+        exposed_ports:
+          - 80
+        ports:
+          - 80:80
+        volumes: "{{webroot}}:/usr/local/apache2/htdocs/"
+        networks:
+          - name: "{{network_name}}"
