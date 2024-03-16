@@ -17,9 +17,9 @@
       register: docker_valid
       ignore_errors: yes
 
-    - name: Print variable values
-      debug:
-        var: docker_valid #contains a json object
+    # - name: Print variable values
+    #   debug:
+    #     var: docker_valid #contains a json object
 
     - name: Install Docker pre-requisites
       include_tasks: docker-install.yaml
