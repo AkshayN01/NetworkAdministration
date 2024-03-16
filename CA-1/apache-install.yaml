@@ -1,6 +1,7 @@
+---
 - name: Create docker network
-      shell: "sudo docker network create --driver=bridge --subnet={{subnet}} {{network_name}} || true" #adding '|| true' will not return error while running the script again
-      become: true
+  shell: "sudo docker network create --driver=bridge --subnet={{subnet}} {{network_name}} || true" #adding '|| true' will not return error while running the script again
+  become: true
 
 - name: pull image
   community.docker.docker_image:
