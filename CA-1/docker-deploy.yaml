@@ -9,7 +9,7 @@
     network_name: shared
     subnet: 172.168.10.0/30
     host_port: 80
-    webroot: "./website/"
+    webroot: "/home/custom-website/"
 
   tasks:
     - name: Check if docker is installed or not
@@ -40,6 +40,11 @@
       ansible.builtin.file:
         path: "{{webroot}}"
         state: directory
+
+    - name: copy index.html
+      ansible.builtin.copy:
+        src: './website/index.html'
+        dest: "{{webroot}}index.html"
 
     - name: run httpd container
       community.docker.docker_container:
